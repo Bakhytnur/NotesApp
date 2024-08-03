@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.title}>
-        Blog App
+        Notes App
       </div>
       <div className={styles.navbarControls}>
         <input
