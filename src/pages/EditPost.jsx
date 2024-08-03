@@ -1,31 +1,23 @@
 import React, { useState } from 'react';
 import styles from './EditPost.module.css';
 
-const AddPost = ({ onSave, onClose }) => {
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [desc, setDesc] = useState('');
-  const [tag, setTag] = useState('');
-  const [tags, setTags] = useState([]);
+const EditPost = ({ post, onSave, onClose }) => {
+  const [title, setTitle] = useState(post.title);
+  const [date, setDate] = useState(post.date);
+  const [desc, setDesc] = useState(post.desc);
+  //const [tags, setTags] = useState(post.tags);
 
-  //console.log(post);
+  console.log(post);
 
   const handleSave = () => {
-    const newPost = {
+    const updatedPost = {
+      ...post,
       title,
       date,
       desc,
-      tags: tags.map(name => ({ id: Date.now(), name }))
       //tags: tags.split(',').map(tag => tag.trim())
     };
-    onSave(newPost);
-  };
-
-  const saveTag = () => {
-    if (tag.trim()) {
-      setTags(prevTags => [...prevTags, tag.trim()]);
-      setTag('');
-    }
+    onSave(updatedPost);
   };
 
   return (
@@ -46,14 +38,10 @@ const AddPost = ({ onSave, onClose }) => {
       <div className={styles.field}>
         <label>Tags</label>
         {/*<input type="text" value={tags} onChange={(e) => setTags(e.target.value)} />*/}
-        <div className={styles.field}>
-          <input type="text" value={tag} onChange={(e) => setTag(e.target.value)} />
-          <button onClick={saveTag}>Save tag</button>
-        </div>
         <div className={styles.tags}>
-          {tags.length > 0 ? tags.map((t, index) => (
-            <div className={styles.tag} key={index}>{t}</div>
-          )) : 'Add your tags'}
+          {post.tags?.map(tag => (
+            <div className={styles.tag} key={tag.id}>{tag.name}</div>
+          ))}
         </div>
       </div>
       <div className={styles.buttons}>
@@ -64,4 +52,4 @@ const AddPost = ({ onSave, onClose }) => {
   );
 };
 
-export default AddPost;
+export default EditPost;
