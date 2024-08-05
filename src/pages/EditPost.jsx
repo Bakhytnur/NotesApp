@@ -1,23 +1,46 @@
 import React, { useState } from 'react';
 import styles from './EditPost.module.css';
+import { useDispatch } from 'react-redux';
+import { updatePost } from '../store/slices/postsSlice';
+import { v4 as uuidv4 } from 'uuid';
 
-const EditPost = ({ post, onSave, onClose }) => {
-  const [title, setTitle] = useState(post.title);
-  const [date, setDate] = useState(post.date);
-  const [desc, setDesc] = useState(post.desc);
-  //const [tags, setTags] = useState(post.tags);
+const EditPost = ({ post, onClose }) => {
+  const dispatch = useDispatch();
 
-  console.log(post);
+  const [title, setTitle] = useState(post.title || '');
+  const [date, setDate] = useState(post.date || '');
+  const [description, setDescription] = useState(post.description || '');
+  const [tag, setTag] = useState('');
+  const [tags, setTags] = useState(post.tags !== null ? post.tags : []);
+
+  //console.log(post);
+  console.log(tags);
 
   const handleSave = () => {
     const updatedPost = {
       ...post,
       title,
       date,
-      desc,
+      description,
+      tagNames: tags
+      //tagNames: tags
       //tags: tags.split(',').map(tag => tag.trim())
     };
-    onSave(updatedPost);
+    dispatch(updatePost(updatedPost));
+    onClose();
+    console.log(updatedPost);
+  };
+
+  const saveTag = () => {
+    if (tag.trim() && !tags.find(t => t.name === tag.trim())) {
+      let uniqueId = uuidv4();
+      setTags(prevTags => [...prevTags, { id: uniqueId, name: tag.trim() }]);
+      setTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter(t => t.name !== tagToRemove.name));
   };
 
   return (
@@ -33,15 +56,22 @@ const EditPost = ({ post, onSave, onClose }) => {
       </div>
       <div className={styles.field}>
         <label>Description</label>
-        <textarea value={desc} onChange={(e) => setDesc(e.target.value)} />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
       <div className={styles.field}>
         <label>Tags</label>
         {/*<input type="text" value={tags} onChange={(e) => setTags(e.target.value)} />*/}
+        <div className={styles.field}>
+          <input type="text" value={tag} onChange={(e) => setTag(e.target.value)} />
+          <button onClick={saveTag}>Add Tag</button>
+        </div>
         <div className={styles.tags}>
-          {post.tags?.map(tag => (
-            <div className={styles.tag} key={tag.id}>{tag.name}</div>
-          ))}
+          {tags.length > 0 ? tags.map((t, index) => (
+            <div className={styles.tag} key={index}>
+              {t.name}
+              <button onClick={() => removeTag(t)}>Remove</button>
+            </div>
+          )) : 'Add your tags'}
         </div>
       </div>
       <div className={styles.buttons}>

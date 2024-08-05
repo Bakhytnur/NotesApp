@@ -6,14 +6,14 @@ import styles from './PostList.module.css'
 import { MdAddCircleOutline } from "react-icons/md";
 import EditPost from './EditPost';
 import AddPost from './AddPost';
-import { fetchPosts } from '../store/slices/postsSlice';
+import { fetchPosts, fetchTags } from '../store/slices/postsSlice';
 
 const posts2 = [
     {
         id: 1,
         title: 'abcabcabcabcabcabcabca',
         date: '17:00:00',
-        desc: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
+        description: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
         tags: [{id: 1, name: '#qwe'}, {id: 2, name: '#asd'}, {id: 3, name: '#ghh'}],
         type: 'post'
     },
@@ -21,7 +21,7 @@ const posts2 = [
         id: 2,
         title: 'abcabcabcabcabcabcabca2',
         date: '17:00:00',
-        desc: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
+        description: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
         tags: [{id: 1, name: '#qwe'}, {id: 2, name: '#123'}, {id: 3, name: '#rtf'}],
         type: 'post'
     },
@@ -29,7 +29,7 @@ const posts2 = [
         id: 3,
         title: 'abcabcabcabcabcabcabca3',
         date: '17:00:00',
-        desc: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
+        description: 'abcabcabaasdadasdasdasdasdadasdasdasdasadasdsa',
         tags: [{id: 1, name: '#qwe'}, {id: 2, name: '#tyu'}, {id: 3, name: '#jkj'}],
         type: 'post'
     },
@@ -37,7 +37,7 @@ const posts2 = [
 
 const PostList = () => {
   const dispatch = useDispatch();
-  const { posts, status, error } = useSelector((state) => state.posts);
+  const { posts, status, error, available_tags } = useSelector((state) => state.posts);
 
   const [selectedPost, setSelectedPost] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
@@ -46,10 +46,11 @@ const PostList = () => {
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchPosts());
+      dispatch(fetchTags());
     }
   }, [dispatch, status]);
 
-  console.log(posts);
+  //console.log(posts);
 
   if (status === 'loading') return <p>Loading...</p>;
   if (status === 'failed') return <p>Error: {error}</p>;
@@ -82,7 +83,7 @@ const PostList = () => {
     <div className={styles.post_list_container}>
       <div className={styles.post_list}>
         {posts.map(post => (
-            <PostItem key={post.id} title={post.title} date={post.date} desc={post.desc} tags={post.tags} type={post.type} openPost={() => handlePostClick(post)} onEditClick={() => handleEditClick(post)} />
+            <PostItem key={post.id} post={post} type={post.type} openPost={() => handlePostClick(post)} onEditClick={() => handleEditClick(post)} />
         ))}
         <div className={styles.add_button} onClick={handleAddPost}>
           <MdAddCircleOutline size={28} />
@@ -93,7 +94,7 @@ const PostList = () => {
           <div>
             <h1>{selectedPost.title}</h1>
             <p>Date: {selectedPost.date}</p>
-            <p>{selectedPost.desc}</p>
+            <p>{selectedPost.description}</p>
             <div>
               {selectedPost.tags?.map(tag => (
                 <span key={tag.id} style={{ marginRight: '5px' }}>{tag.name}</span>
